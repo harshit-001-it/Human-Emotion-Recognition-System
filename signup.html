@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Up — Clean Form</title>
+  <link rel="stylesheet" href="signup.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <div class="card">
+        <h1>Create your account</h1>
+        <p>Join us — it only takes a minute. We'll keep your information safe and private.</p>
+        <div class="or">&nbsp;</div>
+        <div class="muted-line">
+          <span class="small">Already have an account?</span>
+          <a href="login.html" class="small" style="color:var(--accent);text-decoration:none">Sign in</a>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="card">
+        <h2 style="font-size:16px;margin:0 0 8px">Why join?</h2>
+        <ul style="margin:0;padding-left:18px;color:var(--muted);">
+          <li>Save your preferences</li>
+          <li>Access exclusive content</li>
+          <li>Securely sync across devices</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="padding:28px 22px;">
+      <form id="signupForm" novalidate>
+        <div class="row">
+          <div class="field">
+            <label for="firstName">First name</label>
+            <input id="firstName" name="firstName" type="text" autocomplete="given-name" required placeholder="Aman">
+          </div>
+          <div class="field">
+            <label for="lastName">Last name</label>
+            <input id="lastName" name="lastName" type="text" autocomplete="family-name" required placeholder="Kumar">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="field password-wrap">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" minlength="8" required aria-describedby="pwHelp" placeholder="At least 8 characters">
+          <button type="button" class="toggle-btn" id="togglePw" aria-label="Show password">Show</button>
+          <div id="pwHelp" class="small">Use 8 or more characters. Mix letters and numbers for stronger password.</div>
+        </div>
+
+        <div class="field password-wrap">
+          <label for="confirmPw">Confirm password</label>
+          <input id="confirmPw" name="confirmPw" type="password" minlength="8" required placeholder="Re-enter password">
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone (optional)</label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="+91 98765 43210" pattern="[0-9+\\-() ]{7,}" />
+        </div>
+
+        <label class="terms">
+          <input id="agree" type="checkbox" required>
+          <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+        </label>
+
+        <div class="actions">
+          <button id="submitBtn" type="submit">Create account</button>
+          <div class="helper">By creating an account you agree to our policies.</div>
+        </div>
+
+        <div class="or">OR</div>
+
+        <div class="socials">
+          <button type="button">Continue with Google</button>
+          <button type="button">Continue with Apple</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('togglePw');
+    const pw = document.getElementById('password');
+    const confirmPw = document.getElementById('confirmPw');
+    const form = document.getElementById('signupForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    toggle.addEventListener('click', () => {
+      const show = pw.type === 'password';
+      pw.type = show ? 'text' : 'password';
+      confirmPw.type = show ? 'text' : 'password';
+      toggle.textContent = show ? 'Hide' : 'Show';
+    });
+
+    function showToast(msg){ alert(msg); }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()){
+        showToast('Please fill the form correctly.');
+        return;
+      }
+      if (pw.value !== confirmPw.value){
+        showToast('Passwords do not match.');
+        confirmPw.focus();
+        return;
+      }
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+        form.reset();
+        showToast('Account created (simulated).');
+      }, 800);
+    });
+  </script>
+</body>
+</html>
