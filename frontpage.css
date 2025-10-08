@@ -1,0 +1,79 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+}
+
+/* Header styles */
+.header {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 2rem;
+}
+
+.header h1 {
+    margin-bottom: 1rem;
+}
+
+/* Navigation styles */
+.nav {
+    background-color: #444;
+    padding: 1rem;
+    text-align: center;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.nav a:hover {
+    background-color: #666;
+    border-radius: 3px;
+}
+
+/* Main content styles */
+.main-content {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.main-content h2 {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.main-content h3 {
+    color: #444;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.main-content p {
+    margin-bottom: 1rem;
+}
+
+/* Footer styles */
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
