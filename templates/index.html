@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion AI | Premium Experience</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.7.1/gsap.min.js"></script>
+</head>
+
+<body>
+    <div id="canvas-container"></div>
+
+    <div class="overlay">
+        <header>
+            <div class="logo">EMOTION AI</div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="content-wrapper">
+                <div class="video-section">
+                    <div class="video-container">
+                        <img src="{{ url_for('video_feed') }}" alt="Video Feed">
+                        <div class="scan-line"></div>
+                    </div>
+                    <div class="emotion-status">
+                        <h2>Detected Emotion</h2>
+                        <h1 id="current-emotion">Neutral</h1>
+                        <div class="confidence-bar">
+                            <div id="confidence-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Real-time Analysis</h3>
+                    <p>Advanced neural networks analyzing facial micro-expressions to determine emotional state with
+                        high precision.</p>
+                    <div class="stats" id="stats-container">
+                        <!-- Stats injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>
