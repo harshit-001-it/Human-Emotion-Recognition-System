@@ -40,5 +40,11 @@ def emotion_data():
     cam = get_camera()
     return jsonify(cam.get_emotion_data())
 
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    print("Tab closed. Shutting down server...")
+    os._exit(0)
+    return 'Server shutting down...'
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

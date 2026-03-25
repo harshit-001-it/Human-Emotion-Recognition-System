@@ -171,3 +171,8 @@ function update3DScene(emotion) {
 
 // Poll for data
 setInterval(fetchEmotionData, 500);
+
+// Shutdown on tab close
+window.addEventListener('beforeunload', function (e) {
+    navigator.sendBeacon('/shutdown');
+});
