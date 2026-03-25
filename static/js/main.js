@@ -146,16 +146,18 @@ async function processFrame() {
 
 function updateFaceBox(face) {
     if (face) {
+        console.log("Face detected at:", face);
         // Calculate scale (video display size vs capture size)
-        const videoRect = video.getBoundingClientRect();
-        const scaleX = videoRect.width / 640;
-        const scaleY = videoRect.height / 480;
+        const scaleX = video.offsetWidth / 640;
+        const scaleY = video.offsetHeight / 480;
 
         faceBox.style.display = 'block';
         faceBox.style.left = (face.x * scaleX) + 'px';
         faceBox.style.top = (face.y * scaleY) + 'px';
         faceBox.style.width = (face.w * scaleX) + 'px';
         faceBox.style.height = (face.h * scaleY) + 'px';
+        faceBox.style.zIndex = '10';
+        console.log(`Box styled: left=${faceBox.style.left}, top=${faceBox.style.top}, w=${faceBox.style.width}`);
     } else {
         faceBox.style.display = 'none';
     }
