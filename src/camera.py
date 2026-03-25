@@ -47,6 +47,7 @@ class VideoCamera(object):
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
 
+        detections = []
         for (x, y, w, h) in faces:
             if self.model_loaded:
                 roi_gray = gray[y:y+h, x:x+w]
@@ -57,19 +58,27 @@ class VideoCamera(object):
                     roi = img_to_array(roi)
                     roi = np.expand_dims(roi, axis=0)
 
-                    prediction = self.model.predict(roi)[0]
+                    prediction = self.model.predict(roi, verbose=0)[0]
                     label = self.class_labels[prediction.argmax()]
-                    self.current_emotion = label
                     
                     # Store probabilities
                     probs = {}
                     for i, prob in enumerate(prediction):
                         probs[self.class_labels[i]] = float(prob)
-                    self.emotion_probs = probs
                     
-                    return label, probs, {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
+                    detections.append({
+                        'emotion': label,
+                        'probabilities': probs,
+                        'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)
+                    })
 
-        return "Neutral", {}, None
+        if detections:
+            # Set the first/main detection for backward compatibility if needed
+            self.current_emotion = detections[0]['emotion']
+            self.emotion_probs = detections[0]['probabilities']
+            return detections
+            
+        return []
 
     def get_frame(self):
         success, image = self.video.read()

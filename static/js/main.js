@@ -100,8 +100,13 @@ window.addEventListener('resize', () => {
 // Client-Side Camera & Processing
 const video = document.getElementById('video-feed');
 const canvas = document.getElementById('capture-canvas');
-const faceBox = document.getElementById('face-box');
+const faceBoxesContainer = document.getElementById('face-boxes-container');
 const context = canvas.getContext('2d');
+
+// Optimization Constants
+const CAPTURE_WIDTH = 320;
+const CAPTURE_HEIGHT = 240;
+const POLLING_INTERVAL = 300; // 300ms for responsiveness
 
 async function setupCamera() {
     try {
@@ -117,13 +122,13 @@ async function setupCamera() {
 
 async function processFrame() {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
-        // Prepare canvas
-        canvas.width = 640;
-        canvas.height = 480;
+        // Prepare canvas at lower resolution for faster processing
+        canvas.width = CAPTURE_WIDTH;
+        canvas.height = CAPTURE_HEIGHT;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         
-        // Get base64 image
-        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        // Get base64 image with lower quality for speed
+        const imageData = canvas.toDataURL('image/jpeg', 0.5);
         
         try {
             const response = await fetch('/process_frame', {
@@ -133,10 +138,9 @@ async function processFrame() {
             });
             const data = await response.json();
             
-            if (data.emotion) {
-                updateUI(data);
-                update3DScene(data.emotion);
-                updateFaceBox(data.face);
+            if (data.detections) {
+                updateMultiUI(data.detections);
+                updateFaceBoxes(data.detections);
             }
         } catch (error) {
             console.error('Error processing frame:', error);
@@ -144,28 +148,45 @@ async function processFrame() {
     }
 }
 
-function updateFaceBox(face) {
-    if (face) {
-        console.log("Face detected at:", face);
-        // Calculate scale (video display size vs capture size)
-        const scaleX = video.offsetWidth / 640;
-        const scaleY = video.offsetHeight / 480;
+function updateFaceBoxes(detections) {
+    // Clear existing boxes
+    faceBoxesContainer.innerHTML = '';
+    
+    if (!detections || detections.length === 0) return;
 
-        faceBox.style.display = 'block';
-        faceBox.style.left = (face.x * scaleX) + 'px';
-        faceBox.style.top = (face.y * scaleY) + 'px';
-        faceBox.style.width = (face.w * scaleX) + 'px';
-        faceBox.style.height = (face.h * scaleY) + 'px';
-        faceBox.style.zIndex = '10';
-        console.log(`Box styled: left=${faceBox.style.left}, top=${faceBox.style.top}, w=${faceBox.style.width}`);
-    } else {
-        faceBox.style.display = 'none';
-    }
+    const videoRect = video.getBoundingClientRect();
+    const scaleX = video.offsetWidth / CAPTURE_WIDTH;
+    const scaleY = video.offsetHeight / CAPTURE_HEIGHT;
+
+    detections.forEach(face => {
+        const box = document.createElement('div');
+        box.className = 'face-box';
+        box.style.left = (face.x * scaleX) + 'px';
+        box.style.top = (face.y * scaleY) + 'px';
+        box.style.width = (face.w * scaleX) + 'px';
+        box.style.height = (face.h * scaleY) + 'px';
+
+        const label = document.createElement('div');
+        label.className = 'face-label';
+        label.textContent = face.emotion;
+        box.appendChild(label);
+
+        faceBoxesContainer.appendChild(box);
+    });
+}
+
+function updateMultiUI(detections) {
+    if (!detections || detections.length === 0) return;
+    
+    // Update main UI with the first detected face (or primary subject)
+    const primary = detections[0];
+    updateUI(primary);
+    update3DScene(primary.emotion);
 }
 
 // Start sequence
 setupCamera().then(() => {
-    setInterval(processFrame, 500); // Process every 500ms
+    setInterval(processFrame, POLLING_INTERVAL);
 });
 
 function updateUI(data) {

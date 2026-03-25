@@ -54,12 +54,10 @@ def process_frame():
     image_bytes = base64.b64decode(image_data)
     
     cam = get_camera()
-    emotion, probs, face = cam.analyze_frame(image_bytes)
+    detections = cam.analyze_frame(image_bytes)
     
     return jsonify({
-        'emotion': emotion,
-        'probabilities': probs,
-        'face': face
+        'detections': detections
     })
 
 @app.route('/shutdown', methods=['POST'])
