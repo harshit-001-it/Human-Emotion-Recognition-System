@@ -6,7 +6,13 @@ import os
 
 class VideoCamera(object):
     def __init__(self):
-        self.video = cv2.VideoCapture(0)
+        try:
+            self.video = cv2.VideoCapture(0)
+            if not self.video.isOpened():
+                self.video = None
+        except Exception as e:
+            print(f"Warning: Could not open server-side camera: {e}")
+            self.video = None
         
         # Load Face Detection Cascade
         self.face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -26,7 +32,44 @@ class VideoCamera(object):
         self.emotion_probs = {}
 
     def __del__(self):
-        self.video.release()
+        if hasattr(self, 'video') and self.video:
+            self.video.release()
+
+    def analyze_frame(self, frame_data):
+        """Analyze a frame passed as bytes (from client side)"""
+        # Convert bytes to image
+        nparr = np.frombuffer(frame_data, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        if image is None:
+            return "Neutral", {}
+
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
+
+        for (x, y, w, h) in faces:
+            if self.model_loaded:
+                roi_gray = gray[y:y+h, x:x+w]
+                roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
+
+                if np.sum([roi_gray]) != 0:
+                    roi = roi_gray.astype('float') / 255.0
+                    roi = img_to_array(roi)
+                    roi = np.expand_dims(roi, axis=0)
+
+                    prediction = self.model.predict(roi)[0]
+                    label = self.class_labels[prediction.argmax()]
+                    self.current_emotion = label
+                    
+                    # Store probabilities
+                    probs = {}
+                    for i, prob in enumerate(prediction):
+                        probs[self.class_labels[i]] = float(prob)
+                    self.emotion_probs = probs
+                    
+                    return label, probs
+
+        return "Neutral", {}
 
     def get_frame(self):
         success, image = self.video.read()

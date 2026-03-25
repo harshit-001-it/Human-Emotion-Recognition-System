@@ -97,18 +97,55 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Fetch Emotion Data
-async function fetchEmotionData() {
-    try {
-        const response = await fetch('/emotion_data');
-        const data = await response.json();
+// Client-Side Camera & Processing
+const video = document.getElementById('video-feed');
+const canvas = document.getElementById('capture-canvas');
+const context = canvas.getContext('2d');
 
-        updateUI(data);
-        update3DScene(data.emotion);
-    } catch (error) {
-        console.error('Error fetching emotion data:', error);
+async function setupCamera() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { width: 640, height: 480 } 
+        });
+        video.srcObject = stream;
+    } catch (err) {
+        console.error("Error accessing camera:", err);
+        alert("Camera access is required for emotion detection. Please ensure you are using HTTPS if hosted online.");
     }
 }
+
+async function processFrame() {
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        // Prepare canvas
+        canvas.width = 640;
+        canvas.height = 480;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Get base64 image
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        
+        try {
+            const response = await fetch('/process_frame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            });
+            const data = await response.json();
+            
+            if (data.emotion) {
+                updateUI(data);
+                update3DScene(data.emotion);
+            }
+        } catch (error) {
+            console.error('Error processing frame:', error);
+        }
+    }
+}
+
+// Start sequence
+setupCamera().then(() => {
+    setInterval(processFrame, 500); // Process every 500ms
+});
 
 function updateUI(data) {
     const emotionEl = document.getElementById('current-emotion');
@@ -169,8 +206,7 @@ function update3DScene(emotion) {
     }
 }
 
-// Poll for data
-setInterval(fetchEmotionData, 500);
+// Polling for emotion_data removed in favor of processFrame
 
 // Shutdown on tab close
 window.addEventListener('beforeunload', function (e) {
