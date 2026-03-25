@@ -100,6 +100,7 @@ window.addEventListener('resize', () => {
 // Client-Side Camera & Processing
 const video = document.getElementById('video-feed');
 const canvas = document.getElementById('capture-canvas');
+const faceBox = document.getElementById('face-box');
 const context = canvas.getContext('2d');
 
 async function setupCamera() {
@@ -135,10 +136,28 @@ async function processFrame() {
             if (data.emotion) {
                 updateUI(data);
                 update3DScene(data.emotion);
+                updateFaceBox(data.face);
             }
         } catch (error) {
             console.error('Error processing frame:', error);
         }
+    }
+}
+
+function updateFaceBox(face) {
+    if (face) {
+        // Calculate scale (video display size vs capture size)
+        const videoRect = video.getBoundingClientRect();
+        const scaleX = videoRect.width / 640;
+        const scaleY = videoRect.height / 480;
+
+        faceBox.style.display = 'block';
+        faceBox.style.left = (face.x * scaleX) + 'px';
+        faceBox.style.top = (face.y * scaleY) + 'px';
+        faceBox.style.width = (face.w * scaleX) + 'px';
+        faceBox.style.height = (face.h * scaleY) + 'px';
+    } else {
+        faceBox.style.display = 'none';
     }
 }
 

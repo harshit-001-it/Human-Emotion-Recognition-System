@@ -67,9 +67,9 @@ class VideoCamera(object):
                         probs[self.class_labels[i]] = float(prob)
                     self.emotion_probs = probs
                     
-                    return label, probs
+                    return label, probs, {'x': int(x), 'y': int(y), 'w': int(w), 'h': int(h)}
 
-        return "Neutral", {}
+        return "Neutral", {}, None
 
     def get_frame(self):
         success, image = self.video.read()

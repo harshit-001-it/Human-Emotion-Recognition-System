@@ -79,10 +79,22 @@ main {
 
 .content-wrapper {
     display: flex;
-    gap: 4rem;
+    gap: 2rem;
     align-items: center;
     max-width: 1200px;
     width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .content-wrapper {
+        gap: 1rem;
+    }
+    .video-section {
+        width: 100%;
+        max-width: 500px;
+    }
 }
 
 .video-section {
@@ -104,10 +116,20 @@ main {
     background: #000;
 }
 
-.video-container img {
+.video-container video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+#face-box {
+    position: absolute;
+    border: 2px solid #00ff00;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+    border-radius: 4px;
+    pointer-events: none;
+    display: none;
+    transition: all 0.1s ease;
 }
 
 .scan-line {
