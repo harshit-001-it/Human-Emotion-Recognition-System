@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 # Add src to path so we can import app
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
