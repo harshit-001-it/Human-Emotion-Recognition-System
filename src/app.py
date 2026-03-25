@@ -3,9 +3,12 @@ from camera import VideoCamera
 
 import os
 
+# Define the project root directory
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 app = Flask(__name__, 
-            template_folder=os.path.join(os.getcwd(), 'templates'),
-            static_folder=os.path.join(os.getcwd(), 'static'))
+            template_folder=os.path.join(BASE_DIR, 'templates'),
+            static_folder=os.path.join(BASE_DIR, 'static'))
 
 # Global camera instance to share state
 camera = None
