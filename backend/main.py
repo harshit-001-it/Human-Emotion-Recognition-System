@@ -45,14 +45,23 @@ async def predict_image(file: UploadFile = File(...)):
     faces = face_cascade.detectMultiScale(gray, 1.3, 5)
     
     results = []
-    for (x, y, w, h) in faces:
-        face_img = img[y:y+h, x:x+w]
-        emotion, confidence = model_engine.predict(face_img)
+    if len(faces) == 0 and img.shape[0] < 128:
+        # Fallback for pre-cropped dataset images
+        emotion, confidence = model_engine.predict(img)
         results.append({
             "emotion": emotion,
             "confidence": confidence,
-            "bbox": [int(x), int(y), int(w), int(h)]
+            "bbox": [0, 0, int(img.shape[1]), int(img.shape[0])]
         })
+    else:
+        for (x, y, w, h) in faces:
+            face_img = img[y:y+h, x:x+w]
+            emotion, confidence = model_engine.predict(face_img)
+            results.append({
+                "emotion": emotion,
+                "confidence": confidence,
+                "bbox": [int(x), int(y), int(w), int(h)]
+            })
     
     return {"results": results}
 
@@ -72,14 +81,22 @@ async def websocket_endpoint(websocket: WebSocket):
             faces = face_cascade.detectMultiScale(gray, 1.3, 5)
             
             predictions = []
-            for (x, y, w, h) in faces:
-                face_img = img[y:y+h, x:x+w]
-                emotion, confidence = model_engine.predict(face_img)
+            if len(faces) == 0 and img.shape[0] < 128:
+                emotion, confidence = model_engine.predict(img)
                 predictions.append({
                     "emotion": emotion,
                     "confidence": confidence,
-                    "bbox": [int(x), int(y), int(w), int(h)]
+                    "bbox": [0, 0, int(img.shape[1]), int(img.shape[0])]
                 })
+            else:
+                for (x, y, w, h) in faces:
+                    face_img = img[y:y+h, x:x+w]
+                    emotion, confidence = model_engine.predict(face_img)
+                    predictions.append({
+                        "emotion": emotion,
+                        "confidence": confidence,
+                        "bbox": [int(x), int(y), int(w), int(h)]
+                    })
             
             await websocket.send_json({"predictions": predictions})
     except Exception as e:
