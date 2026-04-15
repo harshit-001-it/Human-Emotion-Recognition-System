@@ -13,26 +13,34 @@ if not exist "%PYTHON_EXE%" (
 echo [2/4] Updating Backend Dependencies...
 "%PYTHON_EXE%" -m pip install -r backend\requirements.txt
 
-echo [3/4] Launching Sentient-AI Backend...
-start "Sentient-AI Backend" cmd /k "cd backend && ..\%PYTHON_EXE% main.py"
-
-echo [4/4] Launching Sentient-AI Frontend...
-if exist "frontend\node_modules" (
-    start "Sentient-AI Frontend" cmd /k "cd frontend && npm run dev"
-) else (
-    echo [INFO] First time setup: Installing frontend dependencies...
-    start "Sentient-AI Frontend" cmd /k "cd frontend && npm install && npm run dev"
-)
+echo [4/4] Launching Sentient-AI Stack...
+start "Sentient-AI Backend" /min cmd /c "cd backend && ..\%PYTHON_EXE% main.py"
+start "Sentient-AI Frontend" /min cmd /c "cd frontend && npm run dev"
 
 echo.
 echo ===================================================
 echo [SUCCESS] System initialization triggered.
-echo Backend is running on: http://localhost:8000
-echo Frontend will be running on: http://localhost:5173
 echo.
-echo Waiting for servers to start...
-timeout /t 5 >nul
-echo Opening dashboard in browser...
-start http://localhost:5173
-echo ===================================================
-pause
+echo Waiting for servers to initialize...
+timeout /t 8 >nul
+
+
+echo.
+echo [MONITORING] The system is active. 
+echo ---------------------------------------------------
+echo NOTE: Closing the browser tab will signal the 
+echo backend to shut down, then this window will exit.
+echo ---------------------------------------------------
+echo.
+
+:MONITOR
+timeout /t 3 >nul
+netstat -ano | findstr :8000 | findstr LISTENING >nul
+if %errorlevel% equ 0 goto MONITOR
+
+echo.
+echo [INFO] Backend shutdown detected. Cleaning up...
+taskkill /F /FI "WINDOWTITLE eq Sentient-AI*" /T >nul 2>&1
+timeout /t 2 >nul
+echo Goodbye.
+exit

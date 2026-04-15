@@ -2,13 +2,36 @@ import React, { useState } from 'react';
 import RealTimeFeed from './components/RealTimeFeed';
 import ImageUpload from './components/ImageUpload';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
-import { BrainCircuit, Cpu, ShieldCheck, Github } from 'lucide-react';
+import { BrainCircuit, Cpu, ShieldCheck, Globe } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState('realtime');
+  const [backendReady, setBackendReady] = useState(false);
+
+  React.useEffect(() => {
+    // Simple health check
+    fetch('http://localhost:8000/')
+      .then(res => { if(res.ok) setBackendReady(true); })
+      .catch(() => setBackendReady(false));
+
+    // Auto-shutdown on tab close
+    const handleTabClose = () => {
+      // Use beacon for reliable exit signaling
+      const blob = new Blob([JSON.stringify({ action: 'shutdown' })], { type: 'application/json' });
+      navigator.sendBeacon('http://localhost:8000/shutdown', blob);
+      
+      // Fallback for some browsers
+      fetch('http://localhost:8000/shutdown', { method: 'POST', keepalive: true });
+    };
+
+    window.addEventListener('beforeunload', handleTabClose);
+    return () => window.removeEventListener('beforeunload', handleTabClose);
+  }, []);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ color: 'white' }}>
+      {/* Defensive check for rendering */}
+      <div id="debug-check" style={{ display: 'none' }}>Sentient-AI Loaded</div>
       {/* Navigation Header */}
       <nav className="flex items-center justify-between mb-12">
         <div className="flex items-center gap-3">
@@ -31,7 +54,7 @@ function App() {
             SECURED (JWT)
           </div>
           <a href="#" className="hover:text-white transition-colors">
-            <Github size={20} />
+            <Globe size={20} />
           </a>
         </div>
       </nav>
@@ -58,6 +81,12 @@ function App() {
               Image Analysis
             </button>
           </div>
+
+          {!backendReady && (
+            <div className="p-4 bg-accent/20 border border-accent rounded-xl text-sm mb-4">
+              ⚠️ Backend connection pending. Please ensure backend is running for full functionality.
+            </div>
+          )}
 
           {activeTab === 'realtime' ? <RealTimeFeed /> : <ImageUpload />}
         </div>

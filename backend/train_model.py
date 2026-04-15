@@ -5,9 +5,10 @@ from model_engine import EmotionModel
 import matplotlib.pyplot as plt
 
 # Configuration
-TRAIN_DIR = '../data/Images/train'
-TEST_DIR = '../data/Images/Test'
-MODEL_SAVE_PATH = '../models/emotion_model_v1.h5'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TRAIN_DIR = os.path.join(BASE_DIR, '../data/Images/train')
+TEST_DIR = os.path.join(BASE_DIR, '../data/Images/Test')
+MODEL_SAVE_PATH = os.path.join(BASE_DIR, '../models/emotion_model_v1.h5')
 BATCH_SIZE = 32
 EPOCHS = 20
 

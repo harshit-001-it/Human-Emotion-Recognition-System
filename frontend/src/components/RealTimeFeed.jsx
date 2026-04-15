@@ -6,13 +6,13 @@ const RealTimeFeed = () => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [predictions, setPredictions] = useState([]);
-  const [ws, setWs] = useState(null);
+  const wsRef = useRef(null);
   const [capturedImg, setCapturedImg] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const socket = new WebSocket('ws://localhost:8000/ws/video');
-    setWs(socket);
+    wsRef.current = socket;
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -24,16 +24,16 @@ const RealTimeFeed = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (!isPaused && ws && ws.readyState === WebSocket.OPEN && webcamRef.current) {
+      if (!isPaused && wsRef.current && wsRef.current.readyState === WebSocket.OPEN && webcamRef.current) {
         const imageSrc = webcamRef.current.getScreenshot();
         if (imageSrc) {
-          ws.send(imageSrc);
+          wsRef.current.send(imageSrc);
         }
       }
     }, 200); // 5 FPS for demo stability
 
     return () => clearInterval(interval);
-  }, [ws]);
+  }, [isPaused]);
 
   useEffect(() => {
     if (canvasRef.current) {

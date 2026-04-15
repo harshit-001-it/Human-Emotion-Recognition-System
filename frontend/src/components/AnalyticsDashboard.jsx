@@ -17,8 +17,8 @@ const AnalyticsDashboard = ({ history }) => {
   ];
 
   return (
-    <div className="glass p-6 space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="glass p-6">
+      <div className="flex items-center justify-between mb-8">
         <h2 className="text-xl font-bold flex items-center gap-2">
           <BarChart3 className="text-primary" /> Emotion Intelligence
         </h2>
@@ -27,7 +27,7 @@ const AnalyticsDashboard = ({ history }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[300px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8" style={{ height: '300px' }}>
         <div className="h-full">
           <p className="text-sm text-white/40 mb-4 uppercase tracking-wider">Distribution</p>
           <ResponsiveContainer width="100%" height="100%">
