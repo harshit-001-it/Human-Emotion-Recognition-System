@@ -115,7 +115,10 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception as e:
         print(f"WS Error: {e}")
     finally:
-        await websocket.close()
+        try:
+            await websocket.close()
+        except Exception:
+            pass # Prevent ASGI RuntimeError if already disconnected
 
 @app.post("/shutdown")
 async def shutdown():
