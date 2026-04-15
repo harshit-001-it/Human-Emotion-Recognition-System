@@ -24,6 +24,8 @@ echo.
 echo Waiting for servers to initialize...
 timeout /t 8 >nul
 
+echo Opening dashboard...
+start http://localhost:5173
 
 echo.
 echo [MONITORING] The system is active. 
