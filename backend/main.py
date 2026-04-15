@@ -126,4 +126,8 @@ async def shutdown():
     return {"status": "shutting down"}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import os
+    # Default to localhost for safe clickable console links on Windows, 
+    # but respect environment variables for Docker
+    host_addr = os.getenv("HOST", "127.0.0.1")
+    uvicorn.run(app, host=host_addr, port=8000)
