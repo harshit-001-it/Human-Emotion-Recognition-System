@@ -22,7 +22,7 @@ echo ===================================================
 echo [SUCCESS] System initialization triggered.
 echo.
 echo Waiting for servers to initialize...
-timeout /t 8 >nul
+ping 127.0.0.1 -n 9 >nul
 
 echo Opening dashboard...
 start http://localhost:5173
@@ -36,13 +36,13 @@ echo ---------------------------------------------------
 echo.
 
 :MONITOR
-timeout /t 3 >nul
+ping 127.0.0.1 -n 4 >nul
 netstat -ano | findstr :8000 | findstr LISTENING >nul
 if %errorlevel% equ 0 goto MONITOR
 
 echo.
 echo [INFO] Backend shutdown detected. Cleaning up...
 taskkill /F /FI "WINDOWTITLE eq Sentient-AI*" /T >nul 2>&1
-timeout /t 2 >nul
+ping 127.0.0.1 -n 3 >nul
 echo Goodbye.
 exit
