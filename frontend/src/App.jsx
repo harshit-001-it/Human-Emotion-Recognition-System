@@ -7,6 +7,28 @@ import { BrainCircuit, Cpu, ShieldCheck, Globe } from 'lucide-react';
 function App() {
   const [activeTab, setActiveTab] = useState('realtime');
   const [backendReady, setBackendReady] = useState(false);
+  const [history, setHistory] = useState([
+    { name: 'Happy', value: 0 },
+    { name: 'Neutral', value: 0 },
+    { name: 'Surprise', value: 0 },
+    { name: 'Sad', value: 0 },
+    { name: 'Angry', value: 0 },
+    { name: 'Fear', value: 0 },
+    { name: 'Disgust', value: 0 },
+  ]);
+
+  const handlePrediction = (predictions) => {
+    if (!predictions || predictions.length === 0) return;
+    setHistory(prev => {
+        const newHistory = prev.map(item => ({ ...item }));
+        predictions.forEach(p => {
+             const em = p.emotion.charAt(0).toUpperCase() + p.emotion.slice(1);
+             const item = newHistory.find(h => h.name === em);
+             if (item) item.value += 1;
+        });
+        return newHistory;
+    });
+  };
 
   React.useEffect(() => {
     // Simple health check
@@ -88,12 +110,12 @@ function App() {
             </div>
           )}
 
-          {activeTab === 'realtime' ? <RealTimeFeed /> : <ImageUpload />}
+          {activeTab === 'realtime' ? <RealTimeFeed onPrediction={handlePrediction} /> : <ImageUpload onPrediction={handlePrediction} />}
         </div>
 
         {/* Right Column - Analytics & Info */}
         <div className="lg:col-span-4 flex flex-col gap-8">
-          <AnalyticsDashboard history={[]} />
+          <AnalyticsDashboard history={history} />
           
           <div className="glass p-6 bg-gradient-to-br from-primary/20 to-transparent">
             <div className="flex items-center gap-2 mb-4">

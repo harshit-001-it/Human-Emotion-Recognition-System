@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import Webcam from 'react-webcam';
 import { Activity, Camera, RefreshCcw, Download } from 'lucide-react';
 
-const RealTimeFeed = () => {
+const RealTimeFeed = ({ onPrediction }) => {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   const [predictions, setPredictions] = useState([]);
@@ -17,6 +17,9 @@ const RealTimeFeed = () => {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setPredictions(data.predictions);
+      if (onPrediction) {
+          onPrediction(data.predictions);
+      }
     };
 
     return () => socket.close();
@@ -104,8 +107,8 @@ const RealTimeFeed = () => {
         )}
         <canvas
           ref={canvasRef}
-          width={640}
-          height={480}
+          width={1280}
+          height={720}
           className="absolute top-0 left-0 w-full h-full pointer-events-none"
         />
         

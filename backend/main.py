@@ -25,10 +25,9 @@ app.add_middleware(
 model_engine = EmotionModel() 
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-@app.get("/")
-async def root():
-    return {"message": "Emotion Recognition API is running"}
-
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 @app.post("/token", response_model=Token)
 async def login():
     # Mock login for demonstration
@@ -128,9 +127,36 @@ async def shutdown():
     os.kill(os.getpid(), signal.SIGINT)
     return {"status": "shutting down"}
 
+# Catch-all route for SPA frontend and all static assets
+@app.get("/")
+@app.get("/{path:path}")
+async def serve_spa(path: str = ""):
+    dist_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+    if path:
+        file_path = os.path.join(dist_dir, path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+    
+    # Fallback to index.html for root or unknown paths (React Router support)
+    index_path = os.path.join(dist_dir, "index.html")
+    if os.path.isfile(index_path):
+        return FileResponse(index_path)
+    return {"message": "Emotion Recognition API is running"}
+
 if __name__ == "__main__":
     import os
+    import threading
+    import webbrowser
+    import time
+
     # Default to localhost for safe clickable console links on Windows, 
     # but respect environment variables for Docker
     host_addr = os.getenv("HOST", "127.0.0.1")
+    
+    def open_browser():
+        time.sleep(1.5)
+        webbrowser.open(f"http://{host_addr}:8000")
+        
+    threading.Thread(target=open_browser, daemon=True).start()
+    
     uvicorn.run(app, host=host_addr, port=8000)

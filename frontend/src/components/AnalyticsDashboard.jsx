@@ -27,44 +27,48 @@ const AnalyticsDashboard = ({ history }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8" style={{ height: '300px' }}>
-        <div className="h-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
           <p className="text-sm text-white/40 mb-4 uppercase tracking-wider">Distribution</p>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data}>
-              <XAxis dataKey="name" hide />
-              <YAxis hide />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#171721', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                itemStyle={{ color: '#fff' }}
-              />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data}>
+                <XAxis dataKey="name" hide />
+                <YAxis hide />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#171721', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div className="h-full">
+        <div>
           <p className="text-sm text-white/40 mb-4 uppercase tracking-wider">Composition</p>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
-                dataKey="value"
-              >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {data.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 

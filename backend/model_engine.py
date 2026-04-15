@@ -44,8 +44,8 @@ class EmotionModel:
         # Resize and normalize
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         resized_frame = cv2.resize(rgb_frame, (self.img_size, self.img_size))
-        # Use MobileNetV2's own preprocessing
-        preprocessed_frame = preprocess_input(resized_frame.astype(np.float32))
+        # The model was trained with ImageDataGenerator(rescale=1./255) in train_model.py
+        preprocessed_frame = resized_frame.astype(np.float32) / 255.0
         return np.expand_dims(preprocessed_frame, axis=0)
 
     def predict(self, frame):
